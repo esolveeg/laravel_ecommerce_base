@@ -47,15 +47,15 @@ class AuthTest extends TestCase
         $response->assertStatus(400)->assertExactJson(['email_not_found']);
 
         //no email
-        $response = $this->postJson('/api/login' , [
-	        "password" => $password
-        ]);
-        $response->assertStatus(400)->assertExactJson(["email" => ["email_required"]]);
-        //no password
-        $response = $this->postJson('/api/login' , [
-	        "email" => $email
-        ]);
-        $response->assertStatus(400)->assertExactJson(["password" => ["password_required"]]);
+        // $response = $this->postJson('/api/login' , [
+	    //     "password" => $password
+        // ]);
+        // $response->assertStatus(400)->assertExactJson(["email" => ["email_required"]]);
+        // //no password
+        // $response = $this->postJson('/api/login' , [
+	    //     "email" => $email
+        // ]);
+        // $response->assertStatus(400)->assertExactJson(["password" => ["password_required"]]);
     }
 
     public function testRegister()
@@ -100,37 +100,66 @@ class AuthTest extends TestCase
         ]);
         $response->assertStatus(400)->assertExactJson(["password" =>  ["password_min_6"]]);
 
-        //no name
-        $response = $this->postJson('/api/register' , [
+         $fields = [
+            [
+                'key' => 'email',
+                'required' => true,
+            ],
+            [
+                'key' => 'name',
+                'required' => true,
+            ],
+            [
+                'key' => 'phone',
+                'required' => true,
+            ],
+            [
+                'key' => 'password',
+                'required' => true,
+            ],
+
+         ];
+         $endpoint = '/api/register';
+         $method = 'POST' ;
+         $req = [
             "email" => $faker->unique()->email,
-            "phone" => $faker->unique()->phoneNumber,
-	        "password" => $faker->password
-        ]);
-        $response->assertStatus(400)->assertExactJson(["name" => ["name_required"]]);
-
-
-         //no email
-         $response = $this->postJson('/api/register' , [
             "name" => $faker->name,
             "phone" => $faker->unique()->phoneNumber,
 	        "password" => $faker->password
-        ]);
+         ];
+         $options = ['req' => $req , 'endpoint' => $endpoint , 'method' => $method , 'fields' => $fields];
+         $this->removeFieldFromTest($options);
+        // //no name
+        // $response = $this->postJson('/api/register' , [
+        //     "email" => $faker->unique()->email,
+        //     "phone" => $faker->unique()->phoneNumber,
+	    //     "password" => $faker->password
+        // ]);
+        // $response->assertStatus(400)->assertExactJson(["name" => ["name_required"]]);
 
-        //no phone
-        $response = $this->postJson('/api/register' , [
-            "name" => $faker->name,
-            "email" => $faker->unique()->email,
-	        "password" => $faker->password
-        ]);
-        $response->assertStatus(400)->assertExactJson(["phone" => ["phone_required"]]);
 
-        //no password
-        $response = $this->postJson('/api/register' , [
-            "name" => $faker->name,
-            "email" => $faker->unique()->email,
-	        "phone" => $faker->unique()->phone
-        ]);
-        $response->assertStatus(400)->assertExactJson(["password" => ["password_required"]]);
+        //  //no email
+        //  $response = $this->postJson('/api/register' , [
+        //     "name" => $faker->name,
+        //     "phone" => $faker->unique()->phoneNumber,
+	    //     "password" => $faker->password
+        // ]);
+
+        // //no phone
+        // $response = $this->postJson('/api/register' , [
+        //     "name" => $faker->name,
+        //     "email" => $faker->unique()->email,
+	    //     "password" => $faker->password
+        // ]);
+        // $response->assertStatus(400)->assertExactJson(["phone" => ["phone_required"]]);
+
+        // //no password
+        // $response = $this->postJson('/api/register' , [
+        //     "name" => $faker->name,
+        //     "email" => $faker->unique()->email,
+	    //     "phone" => $faker->unique()->phone
+        // ]);
+        // $response->assertStatus(400)->assertExactJson(["password" => ["password_required"]]);
 
         //
     }
