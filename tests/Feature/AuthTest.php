@@ -177,7 +177,6 @@ class AuthTest extends TestCase
                     //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
-                
                 //check if rul is max
                 if(str_contains($validation , 'max')){
                     //get the max character available
@@ -193,8 +192,6 @@ class AuthTest extends TestCase
                     //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
-
-
                 //check if rul is max
                 if(str_contains($validation , 'min')){
                     //get the min character available
@@ -208,8 +205,6 @@ class AuthTest extends TestCase
                     //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
-
-
                 //check if rule is unique
                 if(str_contains($validation , 'unique')){
                     //get the table
@@ -223,12 +218,8 @@ class AuthTest extends TestCase
                     //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
-                
             }
         }
-
-
-        //check error msg
     }
     
 }
