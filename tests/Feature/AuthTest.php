@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Faker\Generator as Faker;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AuthTest extends TestCase
@@ -161,22 +162,65 @@ class AuthTest extends TestCase
         //declare variables
         $url = $options['url'];
         $rules = $options['rules'];
-        //loop over fields
+        //loop over rules
         foreach($rules as $index => $rule){
+            //catch validations into separated array by exploding "|" character
             $validations = explode('|' ,$rule);
+            // loop over validation rules
             foreach($validations as $validation){
+                //check if the rule is required
                 if($validation == 'required'){
+                    // send the request with null value on the required index
                     $response = $this->postJson($url , $this->registerData([$index => '']));
+                    //ecxpect the response
                     $expected = [$index => [$index."_required"]];
+                    //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
                 
+                //check if rul is max
                 if(str_contains($validation , 'max')){
+                    //get the max character available
                     $chars = explode(":" , $validation)[1];
+                    //clone a valid data
                     $data = $this->registerData();
+                    //append string to the current field with lenght of maximum to make sure it returns error
                     $invalid = $data[$index] . Str::random($chars);
+                    //send request with corrupted data
                     $response = $this->postJson($url , $this->registerData([$index => $invalid]));
+                    //ecxpect the response
                     $expected = [$index => [$index."_max_".$chars]];
+                    //assert that we have validation error and response is equal to expected response
+                    $response->assertStatus(400)->assertExactJson($expected);
+                }
+
+
+                //check if rul is max
+                if(str_contains($validation , 'min')){
+                    //get the min character available
+                    $chars = explode(":" , $validation)[1];
+                    // create invalid index
+                    $invalid = Str::random($chars - 1);
+                    //send request with invalid data
+                    $response = $this->postJson($url , $this->registerData([$index => $invalid])); 
+                    //ecxpect the response
+                    $expected = [$index => [$index."_min_".$chars]];
+                    //assert that we have validation error and response is equal to expected response
+                    $response->assertStatus(400)->assertExactJson($expected);
+                }
+
+
+                //check if rule is unique
+                if(str_contains($validation , 'unique')){
+                    //get the table
+                    $table = explode(":" , $validation)[1];
+                    // create invalid index
+                    $invalid =(array) DB::table($table)->first();
+                    //send request with invalid data
+                    $response = $this->postJson($url , $this->registerData([$index => $invalid[$index]])); 
+                    //ecxpect the response
+                    $expected = [$index => [$index."_already_exists"]];
+                    //assert that we have validation error and response is equal to expected response
                     $response->assertStatus(400)->assertExactJson($expected);
                 }
                 
